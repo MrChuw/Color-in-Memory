@@ -1,7 +1,9 @@
 import uvicorn
 from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse, StreamingResponse
+from fastapi.responses import HTMLResponse, StreamingResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
+from fastapi.responses import JSONResponse
+from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from utils import (
     generate_image_from_rgba, generate_random_hex, generate_rgba_from_cmyk, generate_rgba_from_hex,
@@ -33,14 +35,19 @@ async def get_favicon(hex_code: str):
 @app.get('/', response_class=HTMLResponse)
 async def random_color(request: Request):
     hex_color = generate_random_hex()
-    rgba = generate_rgba_from_hex(hex_color)
-    image_base64 = generate_image_from_rgba(rgba, 1, False)
-    return templates.TemplateResponse("urls_template.html",
-                                      {"request": request, "image_data": image_base64, "code": rgba_to_hex(rgba)}
-                                      )
+    return RedirectResponse(url=f"/hex/{hex_color}.png")
+
+@app.exception_handler(StarletteHTTPException)
+async def custom_404_handler(request: Request, exc: StarletteHTTPException):
+    if exc.status_code == 404:
+        return JSONResponse(
+            status_code=404,
+            content={"error": "Supported paths are \"hex\",\"rgb\",\"rgba\",\"hsl\",\"hsla\",\"cmyk\""},
+        )
+    return await request.app.default_exception_handler(request, exc)
 
 
-@app.get("/hex/{hex_code}", response_class=HTMLResponse)
+@app.get("/hex/{hex_code}.png", response_class=HTMLResponse)
 async def get_hex(request: Request, hex_code: str):
     try:
         rgba = generate_rgba_from_hex(hex_code)
@@ -52,7 +59,7 @@ async def get_hex(request: Request, hex_code: str):
                                       )
 
 
-@app.get("/rgb/{rgb_code}", response_class=HTMLResponse)
+@app.get("/rgb/{rgb_code}.png", response_class=HTMLResponse)
 async def get_rgb_color(request: Request, rgb_code: str):
     try:
         rgba = generate_rgba_from_rgb(rgb_code)
@@ -65,7 +72,7 @@ async def get_rgb_color(request: Request, rgb_code: str):
                                       )
 
 
-@app.get("/rgba/{rgba_code}", response_class=HTMLResponse)
+@app.get("/rgba/{rgba_code}.png", response_class=HTMLResponse)
 async def get_rgba_color(request: Request, rgba_code: str):
     try:
         rgba = generate_rgba_from_rgba(rgba_code)
@@ -78,7 +85,7 @@ async def get_rgba_color(request: Request, rgba_code: str):
                                       )
 
 
-@app.get("/hsl/{hsl_code}", response_class=HTMLResponse)
+@app.get("/hsl/{hsl_code}.png", response_class=HTMLResponse)
 async def get_hsl_color(request: Request, hsl_code: str):
     try:
         rgba = generate_rgba_from_hsl(hsl_code)
@@ -91,7 +98,7 @@ async def get_hsl_color(request: Request, hsl_code: str):
                                       )
 
 
-@app.get("/hsla/{hsla_code}", response_class=HTMLResponse)
+@app.get("/hsla/{hsla_code}.png", response_class=HTMLResponse)
 async def get_hsl_color(request: Request, hsla_code: str):
     try:
         rgba = generate_rgba_from_hsla(hsla_code)
@@ -104,7 +111,7 @@ async def get_hsl_color(request: Request, hsla_code: str):
                                       )
 
 
-@app.get("/cmyk/{cmyk_code}", response_class=HTMLResponse)
+@app.get("/cmyk/{cmyk_code}.png", response_class=HTMLResponse)
 async def get_hsl_color(request: Request, cmyk_code: str):
     try:
         rgba = generate_rgba_from_cmyk(cmyk_code)
