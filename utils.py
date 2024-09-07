@@ -14,7 +14,18 @@ hsl_regex = re.compile(r'(\d{1,3}),(\d{1,3}),(\d{1,3})')
 hsla_regex = re.compile(r'^(\d{1,3}),\s*(\d{1,3}),\s*(\d{1,3}),\s*(0?\.\d+|1\.0|1)$')
 cmyk_regex = re.compile(r'^(\d{1,3}),\s*(\d{1,3}),\s*(\d{1,3}),\s*(\d{1,3})$')
 
-xyz_regex = re.compile(r'^(\d+\.?\d*),\s*(\d+\.?\d*),\s*(\d+\.?\d*)$')
+html_content: str = """
+    <head>
+        <title>#{hex}</title>
+        <link rel="icon" type="image/png" href="/favicon/{hex}">
+        <meta property="og:image" content="{base_url}image/{hex}.png">
+        <meta property="og:type" content="website">
+        <meta property="og:url" content="https://color.mrchuw.com.br/">
+    </head>
+    <body style="display: flex; flex-direction: column;">
+        <img src="data:image/png;base64,{image_base64}">
+    </body>
+    """
 
 
 def rgba_to_hex(rgba):
