@@ -3,6 +3,9 @@ from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse, StreamingResponse, RedirectResponse
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
+from custom_logging import CustomizeLogger
+from pathlib import Path
+import logging
 
 from utils import (
     generate_image_from_rgba, generate_random_hex, generate_rgba_from_cmyk, generate_rgba_from_hex,
@@ -10,7 +13,10 @@ from utils import (
     html_content
 )
 
-app = FastAPI()
+logger = logging.getLogger(__name__)
+config_path = Path(__file__).with_name("logging_config.json")
+app = FastAPI(debug=False)
+app.logger = CustomizeLogger.make_logger(config_path)
 
 
 @app.get("/favicon.ico", response_class=StreamingResponse)
