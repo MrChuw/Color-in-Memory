@@ -1,6 +1,6 @@
 
 services:
-  Image_server:
+  Color_in_memory:
     image: python:3.12
     working_dir: /app
     ports:
