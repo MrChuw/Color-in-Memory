@@ -48,8 +48,7 @@ async def custom_404_handler(request: Request, exc: StarletteHTTPException):
     if exc.status_code == 404:
         return JSONResponse(
             status_code=404,
-            content={"error": "Supported paths are \"hex\",\"rgb\",\"rgba\",\"hsl\",\"hsla\",\"cmyk\""},
-        )
+            content={"error": {"Supported paths are": ["hex","rgb","rgba","hsl","hsla","cmyk"]}})
     return await request.app.default_exception_handler(request, exc)
 
 
