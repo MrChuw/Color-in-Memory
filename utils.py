@@ -21,6 +21,7 @@ html_content: str = """
         <meta property="og:image" content="{base_url}image/{hex}.png">
         <meta property="og:type" content="website">
         <meta property="og:url" content="https://color.mrchuw.com.br/">
+        <script defer src="{ANALYTICS_URL}" data-website-id="{ANALYTICS_UUID}"></script>
     </head>
     <body style="display: flex; flex-direction: column;">
         <img src="data:image/png;base64,{image_base64}">

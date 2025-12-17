@@ -6,6 +6,13 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 from custom_logging import CustomizeLogger
 from pathlib import Path
 import logging
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
+ANALYTICS_URL = os.getenv("ANALYTICS_URL")
+ANALYTICS_UUID = os.getenv("ANALYTICS_UUID")
 
 from utils import (
     generate_image_from_rgba, generate_random_hex, generate_rgba_from_cmyk, generate_rgba_from_hex,
@@ -31,7 +38,7 @@ async def get_favicon():
 
 
 @app.get("/favicon/{hex_code}", response_class=StreamingResponse)
-async def get_favicon(hex_code: str):
+async def get_favicon_color(hex_code: str):
     rgba = generate_rgba_from_hex(hex_code)
     image_io = generate_image_from_rgba(rgba, 1, True)
     return StreamingResponse(image_io, media_type="image/png")
@@ -53,7 +60,7 @@ async def custom_404_handler(request: Request, exc: StarletteHTTPException):
 
 
 @app.get("/image/{hex_code}.png", response_class=HTMLResponse)
-async def get_hex(request: Request, hex_code: str):
+async def get_image(request: Request, hex_code: str):
     try:
         rgba = generate_rgba_from_hex(hex_code)
     except ValueError as e:
@@ -71,7 +78,8 @@ async def get_hex(request: Request, hex_code: str):
         return HTMLResponse(content=f"Invalid hex value: {str(e)}", status_code=400)
     image_base64 = generate_image_from_rgba(rgba, 1, False)
     return HTMLResponse(html_content.format(hex=rgba_to_hex(rgba), base_url=request.base_url,
-                        image_base64=image_base64), status_code=200)
+                        image_base64=image_base64, ANALYTICS_URL=ANALYTICS_URL, 
+                        ANALYTICS_UUID=ANALYTICS_UUID), status_code=200)
 
 
 @app.get("/rgb/{rgb_code}", response_class=HTMLResponse)
@@ -83,7 +91,8 @@ async def get_rgb_color(request: Request, rgb_code: str):
 
     image_base64 = generate_image_from_rgba(rgba, 1, False)
     return HTMLResponse(html_content.format(hex=rgba_to_hex(rgba), base_url=request.base_url,
-                        image_base64=image_base64), status_code=200)
+                        image_base64=image_base64, ANALYTICS_URL=ANALYTICS_URL, 
+                        ANALYTICS_UUID=ANALYTICS_UUID), status_code=200)
 
 
 @app.get("/rgba/{rgba_code}", response_class=HTMLResponse)
@@ -95,7 +104,8 @@ async def get_rgba_color(request: Request, rgba_code: str):
 
     image_base64 = generate_image_from_rgba(rgba, 1, False)
     return HTMLResponse(html_content.format(hex=rgba_to_hex(rgba), base_url=request.base_url,
-                        image_base64=image_base64), status_code=200)
+                        image_base64=image_base64, ANALYTICS_URL=ANALYTICS_URL, 
+                        ANALYTICS_UUID=ANALYTICS_UUID), status_code=200)
 
 
 @app.get("/hsl/{hsl_code}", response_class=HTMLResponse)
@@ -107,11 +117,12 @@ async def get_hsl_color(request: Request, hsl_code: str):
 
     image_base64 = generate_image_from_rgba(rgba, 1, False)
     return HTMLResponse(html_content.format(hex=rgba_to_hex(rgba), base_url=request.base_url,
-                        image_base64=image_base64), status_code=200)
+                        image_base64=image_base64, ANALYTICS_URL=ANALYTICS_URL, 
+                        ANALYTICS_UUID=ANALYTICS_UUID), status_code=200)
 
 
 @app.get("/hsla/{hsla_code}", response_class=HTMLResponse)
-async def get_hsl_color(request: Request, hsla_code: str):
+async def get_hsla_color(request: Request, hsla_code: str):
     try:
         rgba = generate_rgba_from_hsla(hsla_code)
     except ValueError as e:
@@ -119,11 +130,12 @@ async def get_hsl_color(request: Request, hsla_code: str):
 
     image_base64 = generate_image_from_rgba(rgba, 1, False)
     return HTMLResponse(html_content.format(hex=rgba_to_hex(rgba), base_url=request.base_url,
-                        image_base64=image_base64), status_code=200)
+                        image_base64=image_base64, ANALYTICS_URL=ANALYTICS_URL, 
+                        ANALYTICS_UUID=ANALYTICS_UUID), status_code=200)
 
 
 @app.get("/cmyk/{cmyk_code}", response_class=HTMLResponse)
-async def get_hsl_color(request: Request, cmyk_code: str):
+async def get_cmyk_color(request: Request, cmyk_code: str):
     try:
         rgba = generate_rgba_from_cmyk(cmyk_code)
     except ValueError as e:
@@ -131,7 +143,8 @@ async def get_hsl_color(request: Request, cmyk_code: str):
 
     image_base64 = generate_image_from_rgba(rgba, 1, False)
     return HTMLResponse(html_content.format(hex=rgba_to_hex(rgba), base_url=request.base_url,
-                        image_base64=image_base64), status_code=200)
+                        image_base64=image_base64, ANALYTICS_URL=ANALYTICS_URL, 
+                        ANALYTICS_UUID=ANALYTICS_UUID), status_code=200)
 
 
 if __name__ == "__main__":
