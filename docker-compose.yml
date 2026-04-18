@@ -2,12 +2,18 @@
 services:
   Color_in_memory:
     image: python:3.12.6
+    container_name: color
     working_dir: /app
-    ports:
-      - "8383:8383"
+    #ports:
+    #  - "${PORT:-12835}:8383"
     command: >
       /bin/bash -c "pip install -q -r requirements.txt && python main.py"
     volumes:
       - .:/app
     restart: unless-stopped
+    networks:
+      - caddy
 
+networks:
+  caddy:
+    external: true
